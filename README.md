@@ -107,3 +107,17 @@ CloudFormation Template
 Bitnami Wordpressインスタンスをすぐに作成できる
 ただしスケールアップ時に停止が必要
 
+### 構築メモ
+
+- LightsailインスタンスをWordpressイメージで作成
+- IPアドレスを静的に変更
+- Route 53にカスタムドメインを追加 Aレコード
+- ロードバランサー作成
+- 証明書作成
+- Route53に証明書の名前と値をCNAMEとして登録
+- マルチAZでデータベース作成
+- Lightsailインスタンスのwordpress設定のDB接続情報を作成したデータベースに変更
+- Lightsailディストリビューションを作成
+- 証明書を作成
+- Route53に証明書の名前と値をCNAMEとして登録
+- 

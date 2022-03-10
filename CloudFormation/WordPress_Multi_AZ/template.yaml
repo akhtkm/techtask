@@ -152,14 +152,14 @@ Parameters:
     MaxLength: '41'
     AllowedPattern: '[a-zA-Z0-9]*'
     ConstraintDescription: must contain only alphanumeric characters.
-  # MultiAZDatabase:
-  #   Default: 'false'
-  #   Description: Create a Multi-AZ MySQL Amazon RDS database instance
-  #   Type: String
-  #   AllowedValues:
-  #     - 'true'
-  #     - 'false'
-  #   ConstraintDescription: must be either true or false.
+  MultiAZDatabase:
+    Default: 'false'
+    Description: Create a Multi-AZ MySQL Amazon RDS database instance
+    Type: String
+    AllowedValues:
+      - 'true'
+      - 'false'
+    ConstraintDescription: must be either true or false.
   WebServerCapacity:
     Default: '1'
     Description: The initial number of WebServer instances
@@ -695,8 +695,7 @@ Resources:
           FromPort: '3306'
           ToPort: '3306'
           SourceSecurityGroupId: !Ref WebServerSecurityGroup
-      # VpcId: !Ref VpcId
-      VpcId: vpc-0dbf3f6f3e29f09e2
+      VpcId: !Ref VpcId
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 4b62055c-940e-4ffe-908f-7ab9aab3815e

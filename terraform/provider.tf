@@ -5,6 +5,14 @@ terraform {
       version = "~> 4.0"
     }
   }
+
+  cloud {
+    organization = "techtask"
+
+    workspaces {
+      name = "github-actions"
+    }
+  }
 }
 
 provider "aws" {

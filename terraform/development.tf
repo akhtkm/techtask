@@ -1,5 +1,5 @@
 locals {
-  azs = ["${var.region}a", "${var.region}b"]
+  azs = ["${var.region}a", "${var.region}c"]
 }
 
 module "network" {

@@ -2,8 +2,8 @@ locals {
   development_availability_zones = ["${var.region}a", "${var.region}b"]
 }
 
-module "networking" {
-  source               = "./modules/networking"
+module "network" {
+  source               = "./modules/network"
   region               = var.region
   environment          = var.environment
   vpc_cidr             = var.vpc_cidr

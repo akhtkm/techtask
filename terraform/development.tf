@@ -1,13 +1,14 @@
 locals {
-  development_availability_zones = ["${var.region}a", "${var.region}b"]
+  azs = ["${var.region}a", "${var.region}b"]
 }
 
 module "network" {
-  source               = "./modules/network"
-  region               = var.region
-  environment          = var.environment
-  vpc_cidr             = var.vpc_cidr
-  public_subnets_cidr  = var.public_subnets_cidr
-  private_subnets_cidr = var.private_subnets_cidr
-  availability_zones   = local.development_availability_zones
+  source          = "./modules/network/"
+  environment     = "development"
+  region          = "ap-northeast-1"
+  system_name     = "wordpress"
+  vpc_cidr        = "10.0.0.0/16"
+  public_subnets  = ["10.0.1.0/24", "10.0.2.0/24"]
+  private_subnets = ["10.0.10.0/24", "10.0.20.0/24"]
+  azs             = local.azs
 }

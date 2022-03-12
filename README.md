@@ -10,6 +10,25 @@
 
 ---
 
+## Wordpress
+
+### Past changes to supported PHP versions have been as followed:
+
+    In WordPress version 4.1: Added support for PHP 5.6.
+    In WordPress 4.4: Added support for PHP 7.0 (dev note).
+    In WordPress 4.7: Added support for PHP 7.1.
+    In WordPress 4.9: Added support for PHP 7.2.
+    In WordPress 5.0: Added support for PHP 7.3 (dev note).
+    In WordPress 5.2: Dropped support for PHP 5.2, 5.3, 5.4, 5.5.
+    In WordPress 5.3: Added support for PHP 7.4 (dev note).
+    In WordPress 5.6: Added “beta support” for PHP 8.0 (dev note).
+
+## Elastic Beanstalk
+
+- PaaS サービス
+  - 
+- [設計上の考慮事項](https://docs.aws.amazon.com/ja_jp/elasticbeanstalk/latest/dg/concepts.concepts.design.html)
+
 ## Lightsail
 
 Bitnami Wordpress インスタンスをすぐに作成できる

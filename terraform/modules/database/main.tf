@@ -13,7 +13,7 @@ resource "aws_rds_cluster" "rds" {
   backup_retention_period         = 1
   copy_tags_to_snapshot           = true
   database_name                   = "ebdb"
-  db_cluster_parameter_group_name = aws_db_parameter_group.aurora_mysql5_7.name
+  db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.aurora_mysql5_7.name
   availability_zones              = var.azs
   db_subnet_group_name            = aws_db_subnet_group.rds.name
   deletion_protection             = false
@@ -33,12 +33,14 @@ resource "aws_rds_cluster" "rds" {
   }
 }
 
-resource "aws_db_parameter_group" "aurora_mysql5_7" {
+resource "aws_rds_cluster_parameter_group" "aurora_mysql5_7" {
   family = "aurora-mysql5.7"
+  name  = "${local.name_suffix}-pg-aurora-mysql5-7"
   tags = {
-    Name        = "${local.name_suffix}-pg-aurora-mysql5_7"
+    Name        = "${local.name_suffix}-pg-aurora-mysql5-7"
     Environment = var.environment
   }
+
 }
 
 resource "aws_db_subnet_group" "rds" {

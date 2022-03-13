@@ -25,6 +25,7 @@ resource "aws_subnet" "public" {
   tags = {
     Name        = "${local.name_suffix}-${element(var.azs, count.index)}-public-subnet"
     Environment = var.environment
+    Tier        = "Public"
   }
 }
 
@@ -76,6 +77,7 @@ resource "aws_subnet" "private" {
   tags = {
     Name        = "${local.name_suffix}-${element(var.azs, count.index)}-private-subnet"
     Environment = var.environment
+    Tier        = "Private"
   }
 }
 

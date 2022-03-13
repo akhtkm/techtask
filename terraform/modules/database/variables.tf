@@ -15,5 +15,5 @@ variable "azs" {
   description = "Ths availability zone for subnet"
 }
 
+variable "vpc_id" {}
 variable "db_security_group_id" {}
-variable "private_subnet_ids" {}

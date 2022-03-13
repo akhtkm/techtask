@@ -8,12 +8,23 @@ resource "random_password" "password" {
   override_special = "_%@"
 }
 
+data "aws_subnets" "private" {
+  filter {
+    name   = "vpc-id"
+    values = [var.vpc_id]
+  }
+
+  tags = {
+    "Tier" = "Private"
+  }
+}
+
 resource "aws_rds_cluster" "rds" {
   backtrack_window                = 0
   backup_retention_period         = 1
   copy_tags_to_snapshot           = true
   database_name                   = "ebdb"
-  db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.aurora_mysql5_7.name
+  db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.aurora_mysql5_6.name
   availability_zones              = var.azs
   db_subnet_group_name            = aws_db_subnet_group.rds.name
   deletion_protection             = false
@@ -33,18 +44,17 @@ resource "aws_rds_cluster" "rds" {
   }
 }
 
-resource "aws_rds_cluster_parameter_group" "aurora_mysql5_7" {
-  family = "aurora-mysql5.7"
-  name  = "${local.name_suffix}-pg-aurora-mysql5-7"
+resource "aws_rds_cluster_parameter_group" "aurora_mysql5_6" {
+  family = "aurora-mysql5.6"
+  name   = "${local.name_suffix}-pg-aurora-mysql5-6"
   tags = {
-    Name        = "${local.name_suffix}-pg-aurora-mysql5-7"
+    Name        = "${local.name_suffix}-pg-aurora-mysql5-6"
     Environment = var.environment
   }
-
 }
 
 resource "aws_db_subnet_group" "rds" {
-  subnet_ids = var.private_subnet_ids
+  subnet_ids = data.aws_subnets.private.ids
   tags = {
     Name        = "${local.name_suffix}-sg"
     Environment = var.environment

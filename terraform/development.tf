@@ -30,6 +30,6 @@ module "database" {
   region               = local.region
   system_name          = local.system_name
   azs                  = local.azs
-  private_subnet_ids   = module.network.private_subnet_ids
+  vpc_id               = module.network.vpc_id
   db_security_group_id = module.network.db_security_group_id
 }

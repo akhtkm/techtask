@@ -130,3 +130,28 @@ resource "aws_route_table_association" "private" {
   subnet_id      = element(aws_subnet.private.*.id, count.index)
   route_table_id = aws_route_table.private.id
 }
+
+resource "aws_security_group" "db" {
+
+  egress {
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = "0"
+    protocol    = "-1"
+    self        = "false"
+    to_port     = "0"
+  }
+
+  ingress {
+    cidr_blocks = ["133.32.128.250/32", "113.43.73.18/32"]
+    from_port   = "3306"
+    protocol    = "tcp"
+    self        = "false"
+    to_port     = "3306"
+  }
+
+  tags = {
+    Name        = "${local.name_suffix}-sg-db"
+    Environment = var.environment
+  }
+  vpc_id = aws_vpc.vpc.id
+}

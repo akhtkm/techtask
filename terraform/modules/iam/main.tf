@@ -1,7 +1,30 @@
-# resource "aws_iam_role" "beanstalk_service" {
-#     name= "beanstalk_service_role"
-    
+# resource "aws_iam_role" "aws-elasticbeanstalk-service-role" {
+#   assume_role_policy = <<POLICY
+# {
+#   "Statement": [
+#     {
+#       "Action": "sts:AssumeRole",
+#       "Condition": {
+#         "StringEquals": {
+#           "sts:ExternalId": "elasticbeanstalk"
+#         }
+#       },
+#       "Effect": "Allow",
+#       "Principal": {
+#         "Service": "elasticbeanstalk.amazonaws.com"
+#       }
+#     }
+#   ],
+#   "Version": "2012-10-17"
 # }
+# POLICY
+
+#   managed_policy_arns  = ["arn:aws:iam::aws:policy/AWSElasticBeanstalkManagedUpdatesCustomerRolePolicy", "arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkEnhancedHealth"]
+#   max_session_duration = "3600"
+#   name                 = "aws-elasticbeanstalk-service-role"
+#   path                 = "/"
+# }
+
 
 # resource "aws_iam_policy" "beanstalk_service" {
 #   name   = "beanstalk_service"

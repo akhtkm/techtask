@@ -31,11 +31,12 @@ resource "aws_security_group" "db" {
   }
 
   ingress {
-    cidr_blocks = var.allow_cidrs
-    from_port   = "3306"
-    protocol    = "tcp"
-    self        = "false"
-    to_port     = "3306"
+    cidr_blocks     = var.allow_cidrs
+    from_port       = "3306"
+    protocol        = "tcp"
+    self            = "false"
+    to_port         = "3306"
+    security_groups = ["sg-09ddf3ebdb5567f3f"]
   }
 
   tags = {

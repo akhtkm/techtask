@@ -1,38 +1,50 @@
 # TechTask
 
-## WordPress_Multi_AZ
+---
 
-[CloudFormation Template](CloudFormation/WordPress_Multi_AZ/template.yaml)
+## 構成図
 
-### 構成図
+- ALB + EC2 + RDS(Aurora) の構成
+- EC2
+  - MultiAZ 構成で作成し，可用性を担保
+  - オートスケールを導入していないため，サイズは余裕を持った `t3.medium` を選定
+  - [Compute Optimizer](https://console.aws.amazon.com/compute-optimizer/home?region=ap-northeast-1#/dashboard)で今後のサイズを見直ししていく
+  - [CloudWatch](https://ap-northeast-1.console.aws.amazon.com/cloudwatch/home?region=ap-northeast-1#alarmsV2:alarm/wordpress-ec2-cpuutilization-alarm?)の cpu 使用率アラームを設定，期待値を超えた場合にメール通知する
+    - 手動対応（いずれかの対応を実施）
+      - インスタンスを作成済みの AMI(ami-053ac2a39367f8eeb)から追加作成し，ALB のターゲットに追加する．ヘルスチェックが正常であることを確認する．
+      - インスタンスを停止し，インスタンスタイプを上位のタイプに変更して起動する．
+  - RDS(Aurora)
+    - サーバレスの自動スケールを利用し，インスタンス課金の抑制を測る
+    - MySQL バージョンは 5.6 を採用している．今後，オートスケールに対応させるため，ALB+EC2 の構成を Elastic Beanstalk に置き換えを想定している．Beanstalk のバージョン制約があるため，1 世代前のバージョンとした．
+- WAF
+  - OffceIP の許可ルールを作成し設定．セキュリティグループでもアクセス元制限を実施しているが，オペミス等，事故が無いよう 2 重とした．
+  - 他，今回の構成で使用するルールを導入済み
+    - Wordpress application
+    - AllowOfficeIP
+    - AWS-AWSManagedRulesWordPressRuleSet
+    - AWS-AWSManagedRulesSQLiRuleSet
+    - AWS-AWSManagedRulesPHPRuleSet
+    - AWS-AWSManagedRulesLinuxRuleSet
+    - AWS-AWSManagedRulesCommonRuleSet
+    - AWS-AWSManagedRulesAnonymousIpList
+    - AWS-AWSManagedRulesAmazonIpReputationList
 
 ![構成図](./system-diagram.drawio.png)
 
 ---
 
-## Wordpress
-
-### Past changes to supported PHP versions have been as followed:
-
-    In WordPress version 4.1: Added support for PHP 5.6.
-    In WordPress 4.4: Added support for PHP 7.0 (dev note).
-    In WordPress 4.7: Added support for PHP 7.1.
-    In WordPress 4.9: Added support for PHP 7.2.
-    In WordPress 5.0: Added support for PHP 7.3 (dev note).
-    In WordPress 5.2: Dropped support for PHP 5.2, 5.3, 5.4, 5.5.
-    In WordPress 5.3: Added support for PHP 7.4 (dev note).
-    In WordPress 5.6: Added “beta support” for PHP 8.0 (dev note).
-
 ## Elastic Beanstalk
 
-- PaaS サービス
-  - 
+- ## PaaS サービス
 - [設計上の考慮事項](https://docs.aws.amazon.com/ja_jp/elasticbeanstalk/latest/dg/concepts.concepts.design.html)
+
+  - terraform で頑張ってみたが，Wordpress サイト表示しても 504 エラーとなるのでおそらく通信許可周りがおかしそう． - [terraform 置き場](./terraform) - GitHub Action で Terraform 実行可能
 
 ## Lightsail
 
-Bitnami Wordpress インスタンスをすぐに作成できる
-ただしスケールアップ時に停止が必要
+ALB, Bitnami Wordpress EC2, RDS, DNS Zone をすぐに作成できる
+ただしスケールアップ時に停止が必要となるため，イマイチ．
+また，terraformはほぼインスタンスのみの対応となっているため自動化するなら CloudFormation 一択．
 
 ### 構築メモ
 
@@ -48,6 +60,12 @@ Bitnami Wordpress インスタンスをすぐに作成できる
 - Lightsail ディストリビューションを作成
 - 証明書を作成
 - Route53 に証明書の名前と値を CNAME として登録
+
+## WordPress_Multi_AZ
+
+お勉強がてら CloudFormationのテンプレートを実行してみた
+
+[CloudFormation Template](CloudFormation/WordPress_Multi_AZ/template.yaml)
 
 ---
 

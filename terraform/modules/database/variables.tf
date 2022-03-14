@@ -16,4 +16,7 @@ variable "azs" {
 }
 
 variable "vpc_id" {}
-variable "db_security_group_id" {}
+
+variable "allow_cidrs" {
+  type = list(any)
+}

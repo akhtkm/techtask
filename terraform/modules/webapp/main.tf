@@ -18,6 +18,14 @@ data "aws_subnets" "public" {
   }
 }
 
+
+data "aws_elastic_beanstalk_hosted_zone" "current" {}
+
+data "aws_elastic_beanstalk_solution_stack" "php_latest" {
+  most_recent = true
+  name_regex  = "^64bit Amazon Linux (.*) running PHP 8.0$"
+}
+
 resource "aws_elastic_beanstalk_application" "wordpress" {
   name = "${local.name_suffix}-beanstalk"
   appversion_lifecycle {
@@ -34,7 +42,7 @@ resource "aws_elastic_beanstalk_application" "wordpress" {
 resource "aws_elastic_beanstalk_environment" "wordpress_env" {
   name                = "${local.name_suffix}-beanstalk-env"
   application         = aws_elastic_beanstalk_application.wordpress.name
-  solution_stack_name = "64bit Amazon Linux 2 v3.3.11 running PHP 8.0"
+  solution_stack_name = data.aws_elastic_beanstalk_solution_stack.php_latest.name
   cname_prefix        = "${var.system_name}-${random_string.dns_suffix.result}"
   tier                = "WebServer"
   setting {
@@ -46,6 +54,11 @@ resource "aws_elastic_beanstalk_environment" "wordpress_env" {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "IamInstanceProfile"
     value     = "aws-elasticbeanstalk-ec2-role"
+  }
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "SecurityGroups"
+    value     = var.rds_security_group
   }
   setting {
     namespace = "aws:ec2:vpc"
@@ -80,20 +93,42 @@ resource "aws_elastic_beanstalk_environment" "wordpress_env" {
   setting {
     namespace = "aws:autoscaling:asg"
     name      = "MinSize"
-    value     = 1
+    value     = 2
   }
   setting {
     namespace = "aws:autoscaling:asg"
     name      = "MaxSize"
-    value     = 2
+    value     = 4
   }
   setting {
     namespace = "aws:elasticbeanstalk:healthreporting:system"
     name      = "SystemType"
     value     = "enhanced"
   }
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "RDS_USERNAME"
+    value     = "admin"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "RDS_PASSWORD"
+    value     = var.rds_password
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "RDS_HOSTNAME"
+    value     = var.rds_endpoint
+  }
 
   tags = {
     Environment = var.environment
   }
+}
+
+resource "aws_elastic_beanstalk_application_version" "wordpress-beanstalk" {
+  application = aws_elastic_beanstalk_application.wordpress.name
+  bucket      = "wordpress-beanstalk-daludh78"
+  key         = "wordpress-beanstalk.zip"
+  name        = "0.1"
 }

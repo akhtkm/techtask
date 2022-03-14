@@ -3,6 +3,15 @@ locals {
   region      = "ap-northeast-1"
   system_name = "wordpress"
   azs         = ["${var.region}a", "${var.region}c"]
+  allow_cidrs = ["133.32.128.250/32", "113.43.73.18/32"]
+
+}
+
+module "dns" {
+  source      = "./modules/dns"
+  domain_name = "training2.yumemi.io"
+  cname       = module.webapp.cname
+  zone        = module.webapp.zone
 }
 
 module "network" {
@@ -17,19 +26,23 @@ module "network" {
 }
 
 module "webapp" {
-  source      = "./modules/webapp"
-  environment = local.environment
-  region      = local.region
-  system_name = local.system_name
-  vpc_id      = module.network.vpc_id
+  source             = "./modules/webapp"
+  environment        = local.environment
+  region             = local.region
+  system_name        = local.system_name
+  vpc_id             = module.network.vpc_id
+  allow_cidrs        = local.allow_cidrs
+  rds_endpoint       = module.database.rds_endpoint
+  rds_password       = module.database.rds_password
+  rds_security_group = module.database.rds_security_group
 }
 
 module "database" {
-  source               = "./modules/database"
-  environment          = local.environment
-  region               = local.region
-  system_name          = local.system_name
-  azs                  = local.azs
-  vpc_id               = module.network.vpc_id
-  db_security_group_id = module.network.db_security_group_id
+  source                   = "./modules/database"
+  environment              = local.environment
+  region                   = local.region
+  system_name              = local.system_name
+  azs                      = local.azs
+  vpc_id                   = module.network.vpc_id
+  allow_cidrs              = local.allow_cidrs
 }

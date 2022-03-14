@@ -38,11 +38,11 @@ module "webapp" {
 }
 
 module "database" {
-  source                   = "./modules/database"
-  environment              = local.environment
-  region                   = local.region
-  system_name              = local.system_name
-  azs                      = local.azs
-  vpc_id                   = module.network.vpc_id
-  allow_cidrs              = local.allow_cidrs
+  source      = "./modules/database"
+  environment = local.environment
+  region      = local.region
+  system_name = local.system_name
+  azs         = local.azs
+  vpc_id      = module.network.vpc_id
+  allow_cidrs = local.allow_cidrs
 }

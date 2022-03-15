@@ -1,7 +1,5 @@
 # TechTask
 
----
-
 ## 構成図
 
 - ALB + EC2 + RDS(Aurora) の構成
@@ -36,8 +34,6 @@
 
 ![構成図](./system-diagram.drawio.png)
 
----
-
 ## Elastic Beanstalk
 
 - ## PaaS サービス
@@ -51,21 +47,21 @@ ALB, Bitnami Wordpress EC2, RDS, DNS Zone をすぐに作成できる
 ただしスケールアップ時に停止が必要となるため，イマイチ．
 また，terraformはほぼインスタンスのみの対応となっているため自動化するなら CloudFormation 一択．
 
-### 構築メモ
+- 構築メモ
 
-- Lightsail インスタンスを Wordpress イメージで作成
-  - セキュリティ設定の通信元を自宅作業用 IP アドレス，オフィスネットのアドレスに変更
-- IP アドレスを静的に変更
-- Route 53 にカスタムドメインを追加 A レコード
-- ロードバランサー作成
-- 証明書作成
-- Route53 に証明書の名前と値を CNAME として登録
-- マルチ AZ でデータベース作成
-- Lightsail インスタンスの wordpress 設定の DB 接続情報を作成したデータベースに変更
-- Lightsail ディストリビューションを作成
-- 証明書を作成
-- Route53 に証明書の名前と値を CNAME として登録
-
+    - Lightsail インスタンスを Wordpress イメージで作成
+      - セキュリティ設定の通信元を自宅作業用 IP アドレス，オフィスネットのアドレスに変更
+    - IP アドレスを静的に変更
+    - Route 53 にカスタムドメインを追加 A レコード
+    - ロードバランサー作成
+    - 証明書作成
+    - Route53 に証明書の名前と値を CNAME として登録
+    - マルチ AZ でデータベース作成
+    - Lightsail インスタンスの wordpress 設定の DB 接続情報を作成したデータベースに変更
+    - Lightsail ディストリビューションを作成
+    - 証明書を作成
+    - Route53 に証明書の名前と値を CNAME として登録
+    
 ## WordPress_Multi_AZ
 
 お勉強がてら CloudFormationのテンプレートを実行してみた

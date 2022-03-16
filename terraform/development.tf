@@ -7,8 +7,8 @@ locals {
 }
 
 module "dns" {
-  source       = "./modules/dns"
-  domain_name  = "training2.yumemi.io"
+  source      = "./modules/dns"
+  domain_name = "training2.yumemi.io"
   # bs_cname     = module.webapp.cname
   # bs_zone      = module.webapp.zone
   alb_dns_name = module.alb.alb_dns_name

@@ -28,3 +28,6 @@ variable "azs" {
   type        = list(any)
   description = "Ths availability zone for subnet"
 }
+
+variable "allow_cidrs" {
+}

@@ -132,3 +132,19 @@ resource "aws_route_table_association" "private" {
   subnet_id      = element(aws_subnet.private.*.id, count.index)
   route_table_id = aws_route_table.private.id
 }
+
+# Defined prefix for allow access
+
+resource "aws_ec2_managed_prefix_list" "allow_access_pl" {
+  name           = "allow-access-pl"
+  address_family = "IPv4"
+  max_entries    = 3
+
+  entry {
+    cidr = var.allow_cidrs[0]
+  }
+
+  entry {
+    cidr = var.allow_cidrs[1]
+  }
+}

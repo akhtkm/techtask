@@ -18,7 +18,7 @@
 - ALB
   - MultiAZ 構成で作成，可用性を担保
   - Certificate Manager にて証明書取得済み
-  - http通信をhttpsにリダイレクト設定，WordpressのHTTP_X_FORWARDED_PROTO設定，ALBのAレコード登録により，ALBによる終端SSL化済み
+  - http 通信を https にリダイレクト設定，Wordpress の HTTP_X_FORWARDED_PROTO 設定，ALB の A レコード登録により，ALB による終端 SSL 化済み
 - WAF
   - OffceIP の許可ルールを作成し設定．セキュリティグループでもアクセス元制限を実施しているが，オペミス等，事故が無いよう 2 重とした．
   - 他，今回の構成で使用するルールを導入済み
@@ -34,6 +34,28 @@
 
 ![構成図](./system-diagram.drawio.png)
 
+### IaC
+
+- 上記構成を terraform にて作成．module は以下の通り．ただし，ALB, EC2 については Console にて作成したため，import を実施している．
+- ※IaC 化ができていないリソースがあり，今後対応していく．
+  - wordpress instance 2 で使用している AMI
+  - ALB の証明書
+  - ALB のWAF
+  - Cloud WatchのAlarm
+
+#### moduleと概要
+
+    - dns
+      - route53 のレコードを追加
+    - network
+      - vpc, subnet, gateway, route を作成
+    - ec2
+      - wordpress instance, security group を作成
+    - alb
+      - alb, target group, security group を作成
+    - database
+      - aurora cluster, rds instance, parameter group, subnet group, security group を作成
+
 ## Elastic Beanstalk
 
 - ## PaaS サービス
@@ -45,26 +67,26 @@
 
 ALB, Bitnami Wordpress EC2, RDS, DNS Zone をすぐに作成できる
 ただしスケールアップ時に停止が必要となるため，イマイチ．
-また，terraformはほぼインスタンスのみの対応となっているため自動化するなら CloudFormation 一択．
+また，terraform はほぼインスタンスのみの対応となっているため自動化するなら CloudFormation 一択．
 
 - 構築メモ
 
-    - Lightsail インスタンスを Wordpress イメージで作成
-      - セキュリティ設定の通信元を自宅作業用 IP アドレス，オフィスネットのアドレスに変更
-    - IP アドレスを静的に変更
-    - Route 53 にカスタムドメインを追加 A レコード
-    - ロードバランサー作成
-    - 証明書作成
-    - Route53 に証明書の名前と値を CNAME として登録
-    - マルチ AZ でデータベース作成
-    - Lightsail インスタンスの wordpress 設定の DB 接続情報を作成したデータベースに変更
-    - Lightsail ディストリビューションを作成
-    - 証明書を作成
-    - Route53 に証明書の名前と値を CNAME として登録
-    
+  - Lightsail インスタンスを Wordpress イメージで作成
+    - セキュリティ設定の通信元を自宅作業用 IP アドレス，オフィスネットのアドレスに変更
+  - IP アドレスを静的に変更
+  - Route 53 にカスタムドメインを追加 A レコード
+  - ロードバランサー作成
+  - 証明書作成
+  - Route53 に証明書の名前と値を CNAME として登録
+  - マルチ AZ でデータベース作成
+  - Lightsail インスタンスの wordpress 設定の DB 接続情報を作成したデータベースに変更
+  - Lightsail ディストリビューションを作成
+  - 証明書を作成
+  - Route53 に証明書の名前と値を CNAME として登録
+
 ## WordPress_Multi_AZ
 
-お勉強がてら CloudFormationのテンプレートを実行してみた
+お勉強がてら CloudFormation のテンプレートを実行してみた
 
 [CloudFormation Template](CloudFormation/WordPress_Multi_AZ/template.yaml)
 

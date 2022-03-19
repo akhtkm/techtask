@@ -60,3 +60,21 @@
 #     }
 #   EOT
 # }
+
+resource "aws_iam_user" "wordpress_plugin" {
+  name = "AWSForWordPressPlugin"
+}
+
+data "aws_iam_policy" "wordpress_plugin" {
+  arn = "arn:aws:iam::aws:policy/AWSForWordPressPluginPolicy"
+}
+
+resource "aws_iam_user_policy_attachment" "wordpress_plugin" {
+  user       = aws_iam_user.wordpress_plugin.name
+  policy_arn = data.aws_iam_policy.wordpress_plugin.arn
+}
+
+resource "aws_iam_access_key" "wordpress_plugin" {
+  user    = aws_iam_user.wordpress_plugin.name
+  pgp_key = var.pgp_key
+}

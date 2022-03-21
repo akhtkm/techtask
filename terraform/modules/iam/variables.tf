@@ -1,1 +1,1 @@
-variable "pgp_key" {}
+# variable "pgp_key" {}

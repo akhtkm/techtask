@@ -21,19 +21,46 @@ resource "aws_security_group" "alb" {
   vpc_id = var.vpc_id
 }
 
-resource "aws_security_group_rule" "allow_http" {
-  type              = "ingress"
-  security_group_id = aws_security_group.alb.id
-  prefix_list_ids   = [var.allow_access_pl]
-  from_port         = 80
-  protocol          = "tcp"
-  to_port           = 80
+
+# for ALB only without cloudfront
+# resource "aws_security_group_rule" "allow_http" {
+#   type              = "ingress"
+#   security_group_id = aws_security_group.alb.id
+#   prefix_list_ids   = [var.allow_access_pl]
+#   from_port         = 80
+#   protocol          = "tcp"
+#   to_port           = 80
+# }
+
+# resource "aws_security_group_rule" "allow_https" {
+#   type              = "ingress"
+#   security_group_id = aws_security_group.alb.id
+#   prefix_list_ids   = [var.allow_access_pl]
+#   from_port         = 443
+#   protocol          = "tcp"
+#   to_port           = 443
+# }
+
+
+# for ALB with cloudfront
+
+data "aws_prefix_list" "cloudfront" {
+  prefix_list_id = "pl-58a04531"
 }
 
-resource "aws_security_group_rule" "allow_https" {
+resource "aws_security_group_rule" "allow_any" {
   type              = "ingress"
   security_group_id = aws_security_group.alb.id
   prefix_list_ids   = [var.allow_access_pl]
+  from_port         = 0
+  protocol          = "tcp"
+  to_port           = 65535
+}
+
+resource "aws_security_group_rule" "allow_cloudfront" {
+  type              = "ingress"
+  security_group_id = aws_security_group.alb.id
+  prefix_list_ids   = [data.aws_prefix_list.cloudfront.id]
   from_port         = 443
   protocol          = "tcp"
   to_port           = 443

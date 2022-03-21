@@ -2,7 +2,11 @@
 
 ## 構成図
 
-- ALB + EC2 + RDS(Aurora) の構成
+- CloudFront + ALB + EC2 + RDS(Aurora) の構成
+
+- CloudFront
+  - [AWS for WordPress プラグイン](https://docs.aws.amazon.com/ja_jp/AmazonCloudFront/latest/DeveloperGuide/WordPressPlugIn.html)を導入済み
+  - WAFを設定し，開発環境アクセスができるユーザーを絞る
 - EC2
   - MultiAZ 構成で作成し，可用性を担保
   - オートスケールを導入していないため，サイズは余裕を持った `t3.medium` を選定
@@ -36,9 +40,11 @@
 
 ### IaC
 
-- 上記構成を terraform にて作成．module は以下の通り．ただし，ALB, EC2 については Console にて作成したため，import を実施している．
-- ※IaC 化ができていないリソースがあり，今後対応していく．
+- 上記構成を terraform にて作成．module は[以下](#### moduleと概要)の通り．ただし，CloudFront は Wordpress Pluginを使用し，ALB, EC2 は Console にて作成したため，import を実施している．
+- ※下記の通りIaC 化ができていないリソースがあり，今後対応していく．
   - wordpress instance 2 で使用している AMI
+  - CloudFrontの証明書
+  - CloudFrontのWAF
   - ALB の証明書
   - ALB のWAF
   - Cloud WatchのAlarm
@@ -55,6 +61,15 @@
       - alb, target group, security group を作成
     - database
       - aurora cluster, rds instance, parameter group, subnet group, security group を作成
+
+### 現環境の課題
+
+- 可能な限り，全リソースのIaC化
+- ワークロードのスパイク対応
+    - EC2インスタンスのオートスケール対応
+    - or 静的ページのホスティング(S3) + 管理者ページ(Wordpress API)の分離
+- 監視設定のチューニング，EC2以外の監視項目の検討
+- CloudFrontがTOPページのみ使用されるため，全ページのCloudFront経由とする設定見直し
 
 ## Elastic Beanstalk
 

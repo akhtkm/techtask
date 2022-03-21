@@ -6,7 +6,12 @@
 
 - CloudFront
   - [AWS for WordPress プラグイン](https://docs.aws.amazon.com/ja_jp/AmazonCloudFront/latest/DeveloperGuide/WordPressPlugIn.html)を導入済み
-  - WAFを設定し，開発環境アクセスができるユーザーを絞る
+  - WAF を設定し，開発環境アクセスができるユーザーを絞る
+    - 現状は自宅環境からは IPv6 も許可しているが都度 IP アドレスを追加する対応となっている
+    - 適用しているルールは次の通り
+      - Wordpress application
+      - AllowOfficeIP
+      - AllowHomeIP
 - EC2
   - MultiAZ 構成で作成し，可用性を担保
   - オートスケールを導入していないため，サイズは余裕を持った `t3.medium` を選定
@@ -23,33 +28,40 @@
   - MultiAZ 構成で作成，可用性を担保
   - Certificate Manager にて証明書取得済み
   - http 通信を https にリダイレクト設定，Wordpress の HTTP_X_FORWARDED_PROTO 設定，ALB の A レコード登録により，ALB による終端 SSL 化済み
-- WAF
-  - OffceIP の許可ルールを作成し設定．セキュリティグループでもアクセス元制限を実施しているが，オペミス等，事故が無いよう 2 重とした．
-  - 他，今回の構成で使用するルールを導入済み
-    - Wordpress application
-    - AllowOfficeIP
-    - AWS-AWSManagedRulesWordPressRuleSet
-    - AWS-AWSManagedRulesSQLiRuleSet
-    - AWS-AWSManagedRulesPHPRuleSet
-    - AWS-AWSManagedRulesLinuxRuleSet
-    - AWS-AWSManagedRulesCommonRuleSet
-    - AWS-AWSManagedRulesAnonymousIpList
-    - AWS-AWSManagedRulesAmazonIpReputationList
+  - WAF
+    - OffceIP の許可ルールを作成し設定．セキュリティグループでもアクセス元制限を実施しているが，オペミス等，事故が無いよう 2 重とした．
+    - 他，今回の構成で使用するルールを導入済み
+      - Wordpress application
+      - AllowOfficeIP
+      - AWS-AWSManagedRulesWordPressRuleSet
+      - AWS-AWSManagedRulesSQLiRuleSet
+      - AWS-AWSManagedRulesPHPRuleSet
+      - AWS-AWSManagedRulesLinuxRuleSet
+      - AWS-AWSManagedRulesCommonRuleSet
+      - AWS-AWSManagedRulesAnonymousIpList
+      - AWS-AWSManagedRulesAmazonIpReputationList
 
 ![構成図](./system-diagram.drawio.png)
 
 ### IaC
 
-- 上記構成を terraform にて作成．module は[以下](#### moduleと概要)の通り．ただし，CloudFront は Wordpress Pluginを使用し，ALB, EC2 は Console にて作成したため，import を実施している．
-- ※下記の通りIaC 化ができていないリソースがあり，今後対応していく．
-  - wordpress instance 2 で使用している AMI
-  - CloudFrontの証明書
-  - CloudFrontのWAF
-  - ALB の証明書
-  - ALB のWAF
-  - Cloud WatchのAlarm
+- 上記構成を terraform にて作成．
+- module は[概要](#### module と概要)の通り．
+- ただし，次のリソースは import を実施している．
+  - CloudFront
+    - Wordpress Plugin を使用したため
+  - ALB, EC2
+    - Console にて作成したため
+- GitHub Action による Terraform Deploy 設定済み，ワークフロー実行タイミングは，main ブランチ push, pull request, 手動の 3 パターン.
+  - ※下記の通り IaC 化ができていないリソースがあり，今後対応していく．
+    - wordpress instance 2 で使用している AMI
+    - CloudFront の証明書
+    - CloudFront の WAF
+    - ALB の証明書
+    - ALB の WAF
+    - Cloud Watch の Alarm
 
-#### moduleと概要
+#### module と概要
 
     - dns
       - route53 のレコードを追加
@@ -61,15 +73,22 @@
       - alb, target group, security group を作成
     - database
       - aurora cluster, rds instance, parameter group, subnet group, security group を作成
+    - iam
+      - AWS for WordPress プラグイン実行ユーザーを作成
+    - cloudfront
+      - CloudFront Distributionを作成
+    - webapp
+      - Elastic Beanstalk を作成 ※現状使用していない
 
 ### 現環境の課題
 
-- 可能な限り，全リソースのIaC化
+- 可能な限り，全リソースの IaC 化
 - ワークロードのスパイク対応
-    - EC2インスタンスのオートスケール対応
-    - or 静的ページのホスティング(S3) + 管理者ページ(Wordpress API)の分離
-- 監視設定のチューニング，EC2以外の監視項目の検討
-- CloudFrontがTOPページのみ使用されるため，全ページのCloudFront経由とする設定見直し
+  - EC2 インスタンスのオートスケール対応
+  - or 静的ページのホスティング(S3) + 管理者ページ(Wordpress API)の分離
+- 監視設定のチューニング，EC2 以外の監視項目の検討
+- CloudFront が TOP ページのみ使用されるため，全ページの CloudFront 経由とする設定見直し
+  - 上記の経路が取れた場合，ALB の WAF，セキュリティグループの設定を CloudFront 経由のみを許可するように見直し
 
 ## Elastic Beanstalk
 
